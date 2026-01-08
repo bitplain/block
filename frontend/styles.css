@@ -8,6 +8,24 @@
   --muted: #94a3b8;
   --success: #4ade80;
   --danger: #f97316;
+  --surface: #0f172a;
+  --table-header: #0f172a;
+  --log-bg: #0f172a;
+}
+
+[data-theme='light'] {
+  color-scheme: light;
+  --bg: #f8fafc;
+  --panel: #ffffff;
+  --panel-border: #e2e8f0;
+  --text: #0f172a;
+  --accent: #2563eb;
+  --muted: #64748b;
+  --success: #16a34a;
+  --danger: #dc2626;
+  --surface: #f1f5f9;
+  --table-header: #e2e8f0;
+  --log-bg: #f1f5f9;
 }
 
 * {
@@ -57,6 +75,13 @@ body {
   font-size: clamp(0.75rem, 1.2vw, 1rem);
 }
 
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: flex-end;
+}
+
 .address-control {
   display: flex;
   flex-direction: column;
@@ -64,8 +89,9 @@ body {
   min-width: min(100%, 420px);
 }
 
-.address-control input {
-  background: #0f172a;
+.address-control input,
+.manual-control input {
+  background: var(--surface);
   border: 1px solid var(--panel-border);
   color: var(--text);
   padding: 0.6rem 0.8rem;
@@ -73,7 +99,9 @@ body {
   width: 100%;
 }
 
-.address-control button {
+.address-control button,
+.manual-control button,
+.theme-toggle {
   background: var(--accent);
   color: #0f172a;
   font-weight: 600;
@@ -84,8 +112,21 @@ body {
   transition: transform 0.2s ease;
 }
 
-.address-control button:hover {
+.address-control button:hover,
+.manual-control button:hover,
+.theme-toggle:hover {
   transform: translateY(-1px);
+}
+
+.manual-control {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  min-width: min(100%, 220px);
+}
+
+.theme-toggle {
+  align-self: flex-start;
 }
 
 .terminal__body {
@@ -141,7 +182,7 @@ body {
   padding: 1rem;
   border: 1px solid var(--panel-border);
   border-radius: 12px;
-  background: #0f172a;
+  background: var(--surface);
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
@@ -186,7 +227,7 @@ body {
 .table-wrapper th {
   position: sticky;
   top: 0;
-  background: #0f172a;
+  background: var(--table-header);
   z-index: 1;
 }
 
@@ -199,7 +240,7 @@ body {
 .log-list {
   flex: 1;
   overflow: auto;
-  background: #0f172a;
+  background: var(--log-bg);
   border-radius: 12px;
   border: 1px solid var(--panel-border);
   padding: 0.75rem 1rem;
