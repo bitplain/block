@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ethereum Portfolio Terminal</title>
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  </head>
+  <body>
+    <div class="terminal">
+      <header class="terminal__header">
+        <div>
+          <h1>Ethereum Portfolio Terminal</h1>
+          <p class="subtitle">Auto-analysis for {{ETH_Address}} and full transaction history.</p>
+        </div>
+        <div class="address-control">
+          <label for="address">ETH Address</label>
+          <input id="address" name="address" type="text" placeholder="{{ETH_Address}}" />
+          <button id="sync">Sync</button>
+        </div>
+      </header>
+
+      <main class="terminal__body">
+        <section class="panel stats">
+          <h2>Portfolio Snapshot</h2>
+          <div class="stat-grid">
+            <div class="stat-card">
+              <span class="label">Total Incoming ETH</span>
+              <span id="total-incoming" class="value">0</span>
+            </div>
+            <div class="stat-card">
+              <span class="label">Total Outgoing ETH</span>
+              <span id="total-outgoing" class="value">0</span>
+            </div>
+            <div class="stat-card">
+              <span class="label">Average Buy Price</span>
+              <span id="avg-price" class="value">$0</span>
+            </div>
+            <div class="stat-card">
+              <span class="label">Transactions</span>
+              <span id="tx-count" class="value">0</span>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel chart">
+          <h2>Accumulation Timeline</h2>
+          <div class="chart-wrapper">
+            <canvas id="price-chart"></canvas>
+          </div>
+        </section>
+
+        <section class="panel transactions">
+          <h2>Transaction Ledger</h2>
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>Timestamp</th>
+                  <th>Type</th>
+                  <th>Amount (ETH)</th>
+                  <th>Price (USD)</th>
+                  <th>From</th>
+                  <th>To</th>
+                </tr>
+              </thead>
+              <tbody id="tx-body"></tbody>
+            </table>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script src="app.js"></script>
+  </body>
+</html>
