@@ -233,8 +233,12 @@ async function parseJsonResponse(response) {
   if (contentType.includes('application/json')) {
     return response.json();
   }
-  const text = await response.text();
-  return { error: `Ожидался JSON, получен ответ ${response.status}: ${text.slice(0, 120)}` };
+  return {
+    error:
+      response.status === 404
+        ? 'API не найдено. Проверьте, что backend запущен и доступен.'
+        : 'Сервис временно недоступен. Попробуйте позже.',
+  };
 }
 
 async function refresh() {
