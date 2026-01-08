@@ -8,8 +8,16 @@ const totalOutgoingEl = document.getElementById('total-outgoing');
 const avgPriceEl = document.getElementById('avg-price');
 const txCountEl = document.getElementById('tx-count');
 const logList = document.getElementById('log-list');
+const themeToggle = document.getElementById('theme-toggle');
+const aitkenInput = document.getElementById('aitken-input');
+const aitkenValue = document.getElementById('aitken-value');
+const saveAitkenButton = document.getElementById('save-aitken');
 
 let chartInstance = null;
+let lastTransactions = [];
+
+const THEME_STORAGE_KEY = 'theme';
+const AITKEN_STORAGE_KEY = 'aitkenValue';
 
 function getApiBase() {
   return '/api';
@@ -31,6 +39,69 @@ function saveAddress(value) {
 
 function loadAddress() {
   return localStorage.getItem('ethAddress') || '';
+}
+
+function saveTheme(value) {
+  localStorage.setItem(THEME_STORAGE_KEY, value);
+}
+
+function loadTheme() {
+  return localStorage.getItem(THEME_STORAGE_KEY);
+}
+
+function setTheme(value) {
+  document.documentElement.dataset.theme = value;
+  saveTheme(value);
+  updateThemeToggleLabel(value);
+  if (lastTransactions.length) {
+    updateChart(lastTransactions);
+  }
+}
+
+function updateThemeToggleLabel(theme) {
+  themeToggle.textContent = theme === 'light' ? 'Тёмная тема' : 'Светлая тема';
+}
+
+function getThemeColors() {
+  const style = getComputedStyle(document.documentElement);
+  const accent = style.getPropertyValue('--accent').trim();
+  const muted = style.getPropertyValue('--muted').trim();
+  const text = style.getPropertyValue('--text').trim();
+  const grid = style.getPropertyValue('--panel-border').trim();
+  return {
+    accent,
+    accentFill: hexToRgba(accent, 0.2),
+    muted,
+    text,
+    grid: hexToRgba(grid, 0.6),
+  };
+}
+
+function hexToRgba(hex, alpha) {
+  if (!hex.startsWith('#') || (hex.length !== 7 && hex.length !== 4)) {
+    return hex;
+  }
+  const normalized =
+    hex.length === 4
+      ? `#${hex[1]}${hex[1]}${hex[2]}${hex[2]}${hex[3]}${hex[3]}`
+      : hex;
+  const bigint = parseInt(normalized.slice(1), 16);
+  const r = (bigint >> 16) & 255;
+  const g = (bigint >> 8) & 255;
+  const b = bigint & 255;
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
+
+function saveAitken(value) {
+  localStorage.setItem(AITKEN_STORAGE_KEY, value);
+}
+
+function loadAitken() {
+  return localStorage.getItem(AITKEN_STORAGE_KEY) || '';
+}
+
+function updateAitkenDisplay(value) {
+  aitkenValue.textContent = value ? value : '—';
 }
 
 function addLog(message, status = 'info') {
@@ -85,6 +156,7 @@ function updateStats(transactions) {
 }
 
 function updateChart(transactions) {
+  const { accent, accentFill, muted, text, grid } = getThemeColors();
   const incoming = transactions
     .filter((tx) => tx.tx_type === 'incoming' && tx.price_usd !== null)
     .sort((a, b) => new Date(a.tx_timestamp) - new Date(b.tx_timestamp));
@@ -105,8 +177,8 @@ function updateChart(transactions) {
         {
           label: 'Цена ETH (USD)',
           data: prices,
-          borderColor: '#38bdf8',
-          backgroundColor: 'rgba(56, 189, 248, 0.2)',
+          borderColor: accent,
+          backgroundColor: accentFill,
           tension: 0.3,
           fill: true,
         },
@@ -117,17 +189,17 @@ function updateChart(transactions) {
       maintainAspectRatio: false,
       scales: {
         x: {
-          ticks: { color: '#94a3b8' },
-          grid: { color: 'rgba(148, 163, 184, 0.2)' },
+          ticks: { color: muted },
+          grid: { color: grid },
         },
         y: {
-          ticks: { color: '#94a3b8' },
-          grid: { color: 'rgba(148, 163, 184, 0.2)' },
+          ticks: { color: muted },
+          grid: { color: grid },
         },
       },
       plugins: {
         legend: {
-          labels: { color: '#e5e7eb' },
+          labels: { color: text },
         },
       },
     },
@@ -136,7 +208,7 @@ function updateChart(transactions) {
 
 async function loadTransactions(address) {
   const response = await fetch(`${getApiBase()}/transactions?address=${address}`);
-  const data = await response.json();
+  const data = await parseJsonResponse(response);
   if (!response.ok) {
     throw new Error(data.error || 'Не удалось загрузить транзакции');
   }
@@ -149,11 +221,20 @@ async function syncTransactions(address) {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ address }),
   });
-  const data = await response.json();
+  const data = await parseJsonResponse(response);
   if (!response.ok) {
     throw new Error(data.error || 'Не удалось синхронизировать данные');
   }
   return data;
+}
+
+async function parseJsonResponse(response) {
+  const contentType = response.headers.get('content-type') || '';
+  if (contentType.includes('application/json')) {
+    return response.json();
+  }
+  const text = await response.text();
+  return { error: `Ожидался JSON, получен ответ ${response.status}: ${text.slice(0, 120)}` };
 }
 
 async function refresh() {
@@ -162,6 +243,7 @@ async function refresh() {
   saveAddress(address);
   addLog('Загружаю сохраненные транзакции...', 'info');
   const transactions = await loadTransactions(address);
+  lastTransactions = transactions;
   txBody.innerHTML = '';
   if (!transactions.length) {
     txBody.appendChild(renderEmptyRow());
@@ -203,12 +285,31 @@ syncButton.addEventListener('click', async () => {
   }
 });
 
+saveAitkenButton.addEventListener('click', () => {
+  const value = aitkenInput.value.trim();
+  saveAitken(value);
+  updateAitkenDisplay(value);
+  addLog('Aitken (InterScan) сохранен вручную.', 'success');
+});
+
+themeToggle.addEventListener('click', () => {
+  const currentTheme = document.documentElement.dataset.theme || 'dark';
+  const nextTheme = currentTheme === 'dark' ? 'light' : 'dark';
+  setTheme(nextTheme);
+});
+
 window.addEventListener('load', async () => {
   const savedAddress = loadAddress();
   addressInput.value = savedAddress || DEFAULT_ADDRESS;
   if (!savedAddress) {
     saveAddress(DEFAULT_ADDRESS);
   }
+  const savedAitken = loadAitken();
+  aitkenInput.value = savedAitken;
+  updateAitkenDisplay(savedAitken);
+  const savedTheme = loadTheme();
+  const prefersLight = window.matchMedia('(prefers-color-scheme: light)').matches;
+  setTheme(savedTheme || (prefersLight ? 'light' : 'dark'));
 
   try {
     await runSyncFlow();
