@@ -282,7 +282,7 @@ syncButton.addEventListener('click', async () => {
   try {
     await runSyncFlow();
   } catch (error) {
-    alert(error.message);
+    addLog(error.message || 'Не удалось выполнить синхронизацию.', 'error');
   } finally {
     syncButton.disabled = false;
     syncButton.textContent = 'Синхронизировать';
