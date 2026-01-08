@@ -236,7 +236,7 @@ async function parseJsonResponse(response) {
   return {
     error:
       response.status === 404
-        ? 'API не найдено. Проверьте, что backend запущен и доступен.'
+        ? 'API не найден. Проверьте, что backend запущен и доступен.'
         : 'Сервис временно недоступен. Попробуйте позже.',
   };
 }

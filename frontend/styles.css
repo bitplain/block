@@ -38,15 +38,15 @@ body {
     'Liberation Mono', 'Courier New', monospace;
   background: var(--bg);
   color: var(--text);
-  height: 100vh;
+  min-height: 100vh;
   width: 100vw;
-  overflow: hidden;
+  overflow-y: auto;
 }
 
 .terminal {
   display: flex;
   flex-direction: column;
-  height: 100vh;
+  min-height: 100vh;
   width: 100vw;
   padding: 2vh 2vw;
   gap: 2vh;
@@ -76,10 +76,11 @@ body {
 }
 
 .controls {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 1rem;
-  align-items: flex-end;
+  align-items: end;
+  width: min(100%, 720px);
 }
 
 .address-control {
@@ -126,14 +127,15 @@ body {
 }
 
 .theme-toggle {
-  align-self: flex-start;
+  align-self: flex-end;
+  width: 100%;
 }
 
 .terminal__body {
   flex: 1;
   display: grid;
   grid-template-columns: 1.1fr 1.4fr;
-  grid-template-rows: minmax(0, 0.9fr) minmax(0, 1.2fr) minmax(0, 0.6fr);
+  grid-template-rows: minmax(0, 0.9fr) minmax(0, 1.2fr) minmax(0, 0.9fr);
   gap: 2vh 2vw;
   min-height: 0;
 }
@@ -169,6 +171,7 @@ body {
 
 .logs {
   grid-column: 1 / 2;
+  min-height: 220px;
 }
 
 .stat-grid {
@@ -251,6 +254,7 @@ body {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+  min-height: 0;
 }
 
 .log-item {
