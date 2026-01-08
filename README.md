@@ -1,63 +1,63 @@
-# Ethereum Portfolio Terminal Dashboard
+# Терминальный дашборд Ethereum-портфеля
 
-A full-screen, terminal-styled dashboard that analyzes an Ethereum address, stores transaction data, and shows historical ETH prices at the time of each incoming transaction. The project is fully containerized with Docker.
+Полноэкранный терминальный интерфейс для анализа Ethereum-адреса: синхронизация транзакций, расчет исторических цен ETH и отображение данных в адаптивной панели.
 
-## Features
+## Возможности
 
-- Fetches all incoming and outgoing transactions for a configured Ethereum address via Etherscan.
-- Resolves historical ETH/USD price per incoming transaction via CoinGecko.
-- Stores data in PostgreSQL with upsert support.
-- Terminal-inspired responsive UI with charts, full-viewport layout, and mobile optimization.
-- Dockerized backend, frontend, and database with health checks.
+- Получение входящих и исходящих транзакций через Etherscan.
+- Определение исторической цены ETH/USD для входящих транзакций через CoinGecko.
+- Хранение данных в PostgreSQL с идемпотентным upsert.
+- Полноэкранный терминальный UI с графиком и адаптивной версткой.
+- Полная контейнеризация (backend, frontend, база данных) с health check.
 
-## Project Structure
+## Структура проекта
 
 ```
-backend/       # Node.js/Express API + PostgreSQL integration
-frontend/      # Static terminal-style dashboard served by Nginx
-.env.example   # Environment variable template
-Dockerfile     # Service build files
+backend/       # Node.js/Express API + PostgreSQL
+frontend/      # Статический терминальный интерфейс, отдаваемый Nginx
+.env.example   # Пример переменных окружения
+Dockerfile     # Dockerfile для сервисов
 ```
 
-## Configuration
+## Настройка
 
-1. Copy the environment template:
+1. Скопируйте шаблон переменных окружения:
 
 ```bash
 cp .env.example .env
 ```
 
-2. Update `.env` with your credentials:
+2. При необходимости измените значения в `.env`:
 
-- `ETHERSCAN_API_KEY`: API key for https://etherscan.io/apis
-- `ETH_ADDRESS`: Ethereum address to analyze
+- `ETHERSCAN_API_KEY`: ключ API https://etherscan.io/apis
+- `ETH_ADDRESS`: адрес Ethereum для анализа
 
-## Running with Docker
+## Запуск через Docker
 
-Build and start everything:
+Сборка и запуск:
 
 ```bash
 docker-compose up --build
 ```
 
-Stop services:
+Остановка:
 
 ```bash
 docker-compose down
 ```
 
-The dashboard will be available at:
+Интерфейс доступен по адресу:
 
 ```
 http://localhost:8080
 ```
 
-## API Endpoints
+## API
 
-- `GET /api/transactions?address=0x...` - Retrieve stored transactions for an address.
-- `POST /api/sync` - Sync transactions from Etherscan and store in the database.
+- `GET /api/transactions?address=0x...` — получить сохраненные транзакции.
+- `POST /api/sync` — синхронизировать транзакции и сохранить в базу.
 
-Example:
+Пример:
 
 ```bash
 curl -X POST http://localhost:8080/api/sync \
@@ -65,7 +65,7 @@ curl -X POST http://localhost:8080/api/sync \
   -d '{"address": "0xYourEthereumAddress"}'
 ```
 
-## Notes
+## Примечания
 
-- CoinGecko rate limits apply. For large transaction histories, the first sync may take time.
-- Transaction values are stored in ETH and price history is stored in USD.
+- CoinGecko имеет лимиты на частоту запросов: при большом объеме транзакций синхронизация может занять время.
+- Значения транзакций хранятся в ETH, цена — в USD.

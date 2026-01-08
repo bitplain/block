@@ -21,7 +21,7 @@ app.get('/health', (_req, res) => {
 app.get('/api/transactions', async (req, res) => {
   const address = req.query.address || process.env.ETH_ADDRESS;
   if (!address) {
-    return res.status(400).json({ error: 'ETH address is required.' });
+    return res.status(400).json({ error: 'Требуется ETH-адрес.' });
   }
 
   try {
@@ -35,7 +35,7 @@ app.get('/api/transactions', async (req, res) => {
 app.post('/api/sync', async (req, res) => {
   const address = (req.body?.address || process.env.ETH_ADDRESS || '').trim();
   if (!address) {
-    return res.status(400).json({ error: 'ETH address is required.' });
+    return res.status(400).json({ error: 'Требуется ETH-адрес.' });
   }
 
   try {
@@ -53,7 +53,7 @@ app.post('/api/sync', async (req, res) => {
         try {
           priceUsd = await getEthPriceUsd(timestamp);
         } catch (priceError) {
-          console.warn('Price lookup failed', priceError.message);
+          console.warn('Не удалось получить цену', priceError.message);
         }
       }
 
@@ -80,11 +80,11 @@ app.post('/api/sync', async (req, res) => {
 async function start() {
   await initDb();
   app.listen(port, () => {
-    console.log(`Backend listening on port ${port}`);
+    console.log(`Backend слушает порт ${port}`);
   });
 }
 
 start().catch((error) => {
-  console.error('Failed to start backend', error);
+  console.error('Не удалось запустить backend', error);
   process.exit(1);
 });

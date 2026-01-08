@@ -33,9 +33,10 @@ function loadAddress() {
 function buildRow(tx) {
   const row = document.createElement('tr');
   const typeClass = tx.tx_type === 'incoming' ? 'incoming' : 'outgoing';
+  const typeLabel = tx.tx_type === 'incoming' ? 'входящая' : 'исходящая';
   row.innerHTML = `
     <td>${new Date(tx.tx_timestamp).toLocaleString()}</td>
-    <td class="${typeClass}">${tx.tx_type}</td>
+    <td class="${typeClass}">${typeLabel}</td>
     <td>${formatEth(tx.amount_eth)}</td>
     <td>${formatUsd(tx.price_usd)}</td>
     <td>${tx.from_address}</td>
@@ -81,7 +82,7 @@ function updateChart(transactions) {
       labels,
       datasets: [
         {
-          label: 'ETH Price (USD)',
+          label: 'Цена ETH (USD)',
           data: prices,
           borderColor: '#38bdf8',
           backgroundColor: 'rgba(56, 189, 248, 0.2)',
@@ -116,7 +117,7 @@ async function loadTransactions(address) {
   const response = await fetch(`${getApiBase()}/transactions?address=${address}`);
   const data = await response.json();
   if (!response.ok) {
-    throw new Error(data.error || 'Failed to load transactions');
+    throw new Error(data.error || 'Не удалось загрузить транзакции');
   }
   return data.transactions || [];
 }
@@ -129,7 +130,7 @@ async function syncTransactions(address) {
   });
   const data = await response.json();
   if (!response.ok) {
-    throw new Error(data.error || 'Failed to sync');
+    throw new Error(data.error || 'Не удалось синхронизировать данные');
   }
   return data;
 }
@@ -149,7 +150,7 @@ syncButton.addEventListener('click', async () => {
   const address = addressInput.value.trim();
   if (!address) return;
   syncButton.disabled = true;
-  syncButton.textContent = 'Syncing...';
+  syncButton.textContent = 'Синхронизация...';
   try {
     await syncTransactions(address);
     await refresh();
@@ -157,7 +158,7 @@ syncButton.addEventListener('click', async () => {
     alert(error.message);
   } finally {
     syncButton.disabled = false;
-    syncButton.textContent = 'Sync';
+    syncButton.textContent = 'Синхронизировать';
   }
 });
 

@@ -12,11 +12,11 @@ export async function fetchTransactions(address, apiKey) {
 
   const response = await fetch(url);
   if (!response.ok) {
-    throw new Error(`Etherscan request failed: ${response.status}`);
+    throw new Error(`Запрос к Etherscan завершился ошибкой: ${response.status}`);
   }
   const data = await response.json();
   if (data.status !== '1' && data.message !== 'No transactions found') {
-    throw new Error(`Etherscan error: ${data.message || 'unknown error'}`);
+    throw new Error(`Ошибка Etherscan: ${data.message || 'неизвестная ошибка'}`);
   }
 
   return Array.isArray(data.result) ? data.result : [];

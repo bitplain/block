@@ -20,7 +20,7 @@ export async function getEthPriceUsd(date) {
 
   const response = await fetch(url);
   if (!response.ok) {
-    throw new Error(`CoinGecko request failed: ${response.status}`);
+    throw new Error(`Запрос к CoinGecko завершился ошибкой: ${response.status}`);
   }
   const data = await response.json();
   const price = data?.market_data?.current_price?.usd ?? null;

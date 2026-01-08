@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Ethereum Portfolio Terminal</title>
+    <title>Крипто-портфель Ethereum</title>
     <link rel="stylesheet" href="styles.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -17,58 +17,66 @@
     <div class="terminal">
       <header class="terminal__header">
         <div>
-          <h1>Ethereum Portfolio Terminal</h1>
-          <p class="subtitle">Auto-analysis for {{ETH_Address}} and full transaction history.</p>
+          <h1>Терминал портфеля Ethereum</h1>
+          <p class="subtitle">
+            Автоанализ для адреса 0xaAcCAf0C21Ad6D1d048E56171ABdabAf60B717dc и полной истории
+            транзакций.
+          </p>
         </div>
         <div class="address-control">
-          <label for="address">ETH Address</label>
-          <input id="address" name="address" type="text" placeholder="{{ETH_Address}}" />
-          <button id="sync">Sync</button>
+          <label for="address">ETH-адрес</label>
+          <input
+            id="address"
+            name="address"
+            type="text"
+            placeholder="0xaAcCAf0C21Ad6D1d048E56171ABdabAf60B717dc"
+          />
+          <button id="sync">Синхронизировать</button>
         </div>
       </header>
 
       <main class="terminal__body">
         <section class="panel stats">
-          <h2>Portfolio Snapshot</h2>
+          <h2>Сводка портфеля</h2>
           <div class="stat-grid">
             <div class="stat-card">
-              <span class="label">Total Incoming ETH</span>
+              <span class="label">Всего входящих ETH</span>
               <span id="total-incoming" class="value">0</span>
             </div>
             <div class="stat-card">
-              <span class="label">Total Outgoing ETH</span>
+              <span class="label">Всего исходящих ETH</span>
               <span id="total-outgoing" class="value">0</span>
             </div>
             <div class="stat-card">
-              <span class="label">Average Buy Price</span>
+              <span class="label">Средняя цена покупки</span>
               <span id="avg-price" class="value">$0</span>
             </div>
             <div class="stat-card">
-              <span class="label">Transactions</span>
+              <span class="label">Транзакции</span>
               <span id="tx-count" class="value">0</span>
             </div>
           </div>
         </section>
 
         <section class="panel chart">
-          <h2>Accumulation Timeline</h2>
+          <h2>Динамика накоплений</h2>
           <div class="chart-wrapper">
             <canvas id="price-chart"></canvas>
           </div>
         </section>
 
         <section class="panel transactions">
-          <h2>Transaction Ledger</h2>
+          <h2>Журнал транзакций</h2>
           <div class="table-wrapper">
             <table>
               <thead>
                 <tr>
-                  <th>Timestamp</th>
-                  <th>Type</th>
-                  <th>Amount (ETH)</th>
-                  <th>Price (USD)</th>
-                  <th>From</th>
-                  <th>To</th>
+                  <th>Время</th>
+                  <th>Тип</th>
+                  <th>Сумма (ETH)</th>
+                  <th>Цена (USD)</th>
+                  <th>Отправитель</th>
+                  <th>Получатель</th>
                 </tr>
               </thead>
               <tbody id="tx-body"></tbody>
