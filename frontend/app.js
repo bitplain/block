@@ -1,3 +1,5 @@
+const DEFAULT_ADDRESS = '0xaAcCAf0C21Ad6D1d048E56171ABdabAf60B717dc';
+
 const addressInput = document.getElementById('address');
 const syncButton = document.getElementById('sync');
 const txBody = document.getElementById('tx-body');
@@ -5,6 +7,7 @@ const totalIncomingEl = document.getElementById('total-incoming');
 const totalOutgoingEl = document.getElementById('total-outgoing');
 const avgPriceEl = document.getElementById('avg-price');
 const txCountEl = document.getElementById('tx-count');
+const logList = document.getElementById('log-list');
 
 let chartInstance = null;
 
@@ -30,6 +33,18 @@ function loadAddress() {
   return localStorage.getItem('ethAddress') || '';
 }
 
+function addLog(message, status = 'info') {
+  const item = document.createElement('div');
+  item.className = `log-item ${status}`;
+  const time = new Date().toLocaleTimeString();
+  item.innerHTML = `<span>${message}</span><time>${time}</time>`;
+  logList.prepend(item);
+}
+
+function clearLogs() {
+  logList.innerHTML = '';
+}
+
 function buildRow(tx) {
   const row = document.createElement('tr');
   const typeClass = tx.tx_type === 'incoming' ? 'incoming' : 'outgoing';
@@ -42,6 +57,12 @@ function buildRow(tx) {
     <td>${tx.from_address}</td>
     <td>${tx.to_address}</td>
   `;
+  return row;
+}
+
+function renderEmptyRow() {
+  const row = document.createElement('tr');
+  row.innerHTML = '<td class="empty" colspan="6">Транзакций пока нет.</td>';
   return row;
 }
 
@@ -139,11 +160,32 @@ async function refresh() {
   const address = addressInput.value.trim();
   if (!address) return;
   saveAddress(address);
+  addLog('Загружаю сохраненные транзакции...', 'info');
   const transactions = await loadTransactions(address);
   txBody.innerHTML = '';
-  transactions.forEach((tx) => txBody.appendChild(buildRow(tx)));
+  if (!transactions.length) {
+    txBody.appendChild(renderEmptyRow());
+  } else {
+    transactions.forEach((tx) => txBody.appendChild(buildRow(tx)));
+  }
   updateStats(transactions);
   updateChart(transactions);
+  addLog(`Транзакций загружено: ${transactions.length}`, 'success');
+}
+
+async function runSyncFlow() {
+  const address = addressInput.value.trim();
+  if (!address) return;
+  clearLogs();
+  addLog('Запускаю синхронизацию с Etherscan...', 'info');
+  try {
+    const result = await syncTransactions(address);
+    addLog(`Синхронизация завершена. Найдено: ${result.synced}`, 'success');
+    await refresh();
+  } catch (error) {
+    addLog(error.message, 'error');
+    throw error;
+  }
 }
 
 syncButton.addEventListener('click', async () => {
@@ -152,8 +194,7 @@ syncButton.addEventListener('click', async () => {
   syncButton.disabled = true;
   syncButton.textContent = 'Синхронизация...';
   try {
-    await syncTransactions(address);
-    await refresh();
+    await runSyncFlow();
   } catch (error) {
     alert(error.message);
   } finally {
@@ -164,12 +205,14 @@ syncButton.addEventListener('click', async () => {
 
 window.addEventListener('load', async () => {
   const savedAddress = loadAddress();
-  if (savedAddress) {
-    addressInput.value = savedAddress;
-    try {
-      await refresh();
-    } catch (error) {
-      console.warn(error);
-    }
+  addressInput.value = savedAddress || DEFAULT_ADDRESS;
+  if (!savedAddress) {
+    saveAddress(DEFAULT_ADDRESS);
+  }
+
+  try {
+    await runSyncFlow();
+  } catch (error) {
+    addLog('Не удалось выполнить автосинхронизацию.', 'error');
   }
 });
