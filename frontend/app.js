@@ -208,7 +208,7 @@ function updateChart(transactions) {
 
 async function loadTransactions(address) {
   const response = await fetch(`${getApiBase()}/transactions?address=${address}`);
-  const data = await response.json();
+  const data = await parseJsonResponse(response);
   if (!response.ok) {
     throw new Error(data.error || 'Не удалось загрузить транзакции');
   }
@@ -221,11 +221,20 @@ async function syncTransactions(address) {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ address }),
   });
-  const data = await response.json();
+  const data = await parseJsonResponse(response);
   if (!response.ok) {
     throw new Error(data.error || 'Не удалось синхронизировать данные');
   }
   return data;
+}
+
+async function parseJsonResponse(response) {
+  const contentType = response.headers.get('content-type') || '';
+  if (contentType.includes('application/json')) {
+    return response.json();
+  }
+  const text = await response.text();
+  return { error: `Ожидался JSON, получен ответ ${response.status}: ${text.slice(0, 120)}` };
 }
 
 async function refresh() {
